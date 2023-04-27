@@ -35,27 +35,54 @@ board_t* create_board(int m, int n, int numColors) {
     return board;
 }
 
-void print_slot(slot_t *slot) {
+void flood_fill_aux(slot_t *slot, int oldColor, int color) {
+    // preenche o tabuleiro com a cor color
+    if (slot->color == oldColor) {
+        slot->color = color;
+        if (slot->left != NULL) flood_fill_aux(slot->left, oldColor, color);
+        if (slot->right != NULL) flood_fill_aux(slot->right, oldColor, color);
+        if (slot->up != NULL) flood_fill_aux(slot->up, oldColor, color);
+        if (slot->down != NULL) flood_fill_aux(slot->down, oldColor, color);
+    }
+}
+
+int is_board_colored(board_t *board, int m, int n) {
+    // verifica se o tabuleiro está colorido
+    int color = board->slots[0][0]->color;
+    for (int i = 0; i < m; i++) 
+        for (int j = 0; j < n; j++)
+            if (board->slots[i][j]->color != color)
+                return 0;
+    return 1;
+}
+
+void flood_fill(board_t *board, int m, int n, int color) {
+    // preenche o tabuleiro com a cor color
+    int oldColor = board->slots[0][0]->color;
+    flood_fill_aux(board->slots[0][0], oldColor, color);
+}
+
+void print_slot(int color) {
     
-    if(slot->color == 0)
+    if(color == 0)
         printf("\033[41m  \033[0m");
-    else if(slot->color == 1)
+    else if(color == 1)
         printf("\033[42m  \033[0m");
-    else if(slot->color == 2)
+    else if(color == 2)
         printf("\033[43m  \033[0m");
-    else if(slot->color == 3)
+    else if(color == 3)
         printf("\033[44m  \033[0m");
-    else if(slot->color == 4)
+    else if(color == 4)
         printf("\033[45m  \033[0m");
-    else if(slot->color == 5)
+    else if(color == 5)
         printf("\033[46m  \033[0m");
-    else if(slot->color == 6)
+    else if(color == 6)
         printf("\033[47m  \033[0m");
-    else if(slot->color == 7)
+    else if(color == 7)
         printf("\033[101m  \033[0m");
-    else if(slot->color == 8)
+    else if(color == 8)
         printf("\033[102m  \033[0m");
-    else if(slot->color == 9)
+    else if(color == 9)
         printf("\033[103m  \033[0m");
 
 }
@@ -64,7 +91,7 @@ void print_board(board_t *board, int m, int n) {
 
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++)
-            print_slot(board->slots[i][j]);
+            print_slot(board->slots[i][j]->color);
         printf("\n");
     }
 
@@ -83,3 +110,4 @@ void destroy_board(board_t *board, int m, int n) {
     // libera a memória alocada para a estrutura board
     free(board);
 }
+
