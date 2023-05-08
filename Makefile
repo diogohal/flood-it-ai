@@ -14,5 +14,5 @@ clean:
 purge: clean
 	rm floodit
 
-run:
+run: all
 	./floodit

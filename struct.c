@@ -58,8 +58,9 @@ int is_board_colored(board_t *board, int m, int n) {
 
 void flood_fill(board_t *board, int m, int n, int color) {
     // preenche o tabuleiro com a cor color
-    int oldColor = board->slots[0][0]->color;
-    flood_fill_aux(board->slots[0][0], oldColor, color);
+    int oldColor = board->slots[m-1][n-1]->color;
+    if (color == oldColor) return;
+    flood_fill_aux(board->slots[m-1][n-1], oldColor, color);
 }
 
 void print_slot(int color) {
