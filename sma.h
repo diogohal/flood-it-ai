@@ -1,6 +1,5 @@
 #ifndef SMA_H
 #define SMA_H
-#include "struct.h"
 
 typedef struct node {
 

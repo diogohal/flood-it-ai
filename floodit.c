@@ -9,11 +9,12 @@ int main() {
 
     // Creates important structures and variables
     int m, n, color, numColors, numMoves = 0;
-    board_t *board = create_board(m, n, numColors);
-    node_t *test = create_node();
-
     scanf("%d %d %d", &m, &n, &numColors);
     printf("%d %d %d\n", m, n, numColors);
+    board_t *board = create_board(m, n, numColors);
+    node_t *test = create_node();
+    root_t *root = create_root(board, m, n);
+
 
     while (!is_board_colored(board, m, n)) {
         // imprime as opções de cores coloridas   
