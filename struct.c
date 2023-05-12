@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "struct.h"
 #include <time.h>
+#include "struct.h"
+#include "sma.h"
 
 board_t* create_board(int m, int n, int numColors) {
     // aloca memória para a estrutura board
