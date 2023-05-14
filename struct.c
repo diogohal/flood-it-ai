@@ -4,6 +4,8 @@
 #include "struct.h"
 #include "sma.h"
 
+
+// ---------- CREATE FUNCTIONS ----------
 board_t* create_board(int m, int n, int numColors) {
     // aloca memória para a estrutura board
     board_t *board = (board_t*) malloc(sizeof(board_t));
@@ -16,6 +18,7 @@ board_t* create_board(int m, int n, int numColors) {
         for (int j = 0; j < n; j++) {
             board->slots[i][j] = (slot_t*) malloc(sizeof(slot_t));
             board->slots[i][j]->color = rand() % numColors;
+            board->slots[i][j]->colored = -1;
             board->slots[i][j]->left = NULL;
             board->slots[i][j]->right = NULL;
             board->slots[i][j]->up = NULL;
@@ -23,7 +26,7 @@ board_t* create_board(int m, int n, int numColors) {
         }
     }
 
-    // define os ponteiros left, right, up e down
+    // Define left, right, up and down pointers
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             if (j > 0) board->slots[i][j]->left = board->slots[i][j-1];
@@ -33,9 +36,17 @@ board_t* create_board(int m, int n, int numColors) {
         }
     }
 
+    // Define colored values for the corners
+    board->slots[0][0]->colored = 0;
+    board->slots[m-1][0]->colored = 1;
+    board->slots[m-1][n-1]->colored = 2;
+    board->slots[0][n-1]->colored = 3;
+    
     return board;
 }
 
+
+// ---------- COLORING FUNCTIONS ----------
 void flood_fill_aux(slot_t *slot, int oldColor, int color) {
     // preenche o tabuleiro com a cor color
     if (slot->color == oldColor) {
@@ -57,13 +68,36 @@ int is_board_colored(board_t *board, int m, int n) {
     return 1;
 }
 
-void flood_fill(board_t *board, int m, int n, int color) {
-    // preenche o tabuleiro com a cor color
-    int oldColor = board->slots[m-1][n-1]->color;
+// Fill the board with the decision obtained in tree search
+void flood_fill(board_t *board, int m, int n, int color, int corner) {
+    
+    int oldColor, x, y = 0;
+
+    if(corner == 0) {
+        x = 0;
+        y = 0;
+    }
+    if(corner == 1) {
+        x = m-1;
+        y = 0;
+    }
+    if(corner == 2) {
+        x = m-1;
+        y = n-1;
+    }
+    if(corner == 3) {
+        x = 0;
+        y = n-1;
+    }
+
+    oldColor = board->slots[x][y]->color;
     if (color == oldColor) return;
-    flood_fill_aux(board->slots[m-1][n-1], oldColor, color);
+    flood_fill_aux(board->slots[x][y], oldColor, color);
+
 }
 
+
+// ---------- PRINTING FUNCTIONS ----------
 void print_slot(int color) {
     
     if(color == 0)
@@ -99,8 +133,10 @@ void print_board(board_t *board, int m, int n) {
 
 }
 
+
+// ---------- DESTROY FUNCTIONS ----------
 void destroy_board(board_t *board, int m, int n) {
-    // libera a memória alocada para os slots
+
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             free(board->slots[i][j]);
@@ -108,8 +144,7 @@ void destroy_board(board_t *board, int m, int n) {
         free(board->slots[i]);
     }
     free(board->slots);
-
-    // libera a memória alocada para a estrutura board
     free(board);
+
 }
 

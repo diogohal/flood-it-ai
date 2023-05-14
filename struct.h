@@ -1,11 +1,12 @@
 #ifndef CANDY_H
 #define CANDY_H
 
-#include "struct.h"
+#include "sma.h"
 
 typedef struct slot {
 
     int color;
+    int colored;
     struct slot *left;
     struct slot *right;
     struct slot *up;
@@ -24,7 +25,7 @@ typedef struct board {
 board_t* create_board(int m, int n, int numColors);
 void print_board(board_t *board, int m, int n);
 void destroy_board(board_t *board, int m, int n);
-void flood_fill(board_t *board, int m, int n, int color);
+void flood_fill(board_t *board, int m, int n, int color, int corner);
 int is_board_colored(board_t *board, int m, int n);
 
 #endif

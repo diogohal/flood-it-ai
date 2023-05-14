@@ -8,7 +8,7 @@ floodit.o: floodit.c
 struct.o: struct.c
 	gcc $(CFLAGS) -c struct.c
 
-sma.o: sma.c
+sma.o: sma.c struct.c
 	gcc $(CFLAGS) -c sma.c
 
 clean:

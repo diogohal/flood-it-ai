@@ -12,7 +12,7 @@ int main() {
     scanf("%d %d %d", &m, &n, &numColors);
     printf("%d %d %d\n", m, n, numColors);
     board_t *board = create_board(m, n, numColors);
-    root_t *root = create_root(board, m, n);
+    root_t *root = create_root(m, n, numColors);
     node_t *node = root->init;
     srand(time(NULL));
 
@@ -27,17 +27,19 @@ int main() {
         print_board(board, m, n);
         // scanf("%d", &color);
         expand_node(node, numColors);
+        // printChildren(node);
         node = decision(node, numColors);
-        color = node->color;
         // color = calculate_weight(node, numColors);
         sleep(1);
         numMoves++;
         //color = HEURISTICA
-        flood_fill(board, m, n, color);
-        printf("Cor: %d | Canto: %d | Peso: %d\n", node->color, node->corner, node->weight);
+        flood_fill(board, m, n, node->color, node->corner);
+        printf("ESCOLHA = Cor: %d | Canto: %d | Peso: %d\n", node->color, node->corner, node->weight);
     }
     print_board(board, m, n);
     printf("Parabéns, você completou o tabuleiro! Número de passos: %d\n", numMoves);
+
+    destroy_root(root, numColors);
     destroy_board(board, m, n);
     return 0;
 
