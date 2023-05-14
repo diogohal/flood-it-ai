@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "struct.h"
 #include "sma.h"
 
 
@@ -47,15 +48,43 @@ int calculate_weight(node_t *node, int numChildren) {
 
 }
 
-// Expand the node for next search
-node_t *expand_node(node_t *node, int numColors) {
+// Calculates the weight based in how much new slots will be colored
+int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node) {
 
+    slot_t copy[m][n];
+    for(int i=0; i<m; i++)
+        for(int j=0; j<n; j++) {
+            copy[i][j].color = board->slots[i][j]->color;
+            copy[i][j].colored = board->slots[i][j]->colored;
+        }
+    
+    int before = countNonColored(board, m, n);
+    flood_fill(board, m, n, node->color, node->corner);
+    int after = countNonColored(board, m, n);
+
+    for(int i=0; i<m; i++)
+        for(int j=0; j<n; j++) {
+            board->slots[i][j]->color = copy[i][j].color;
+            board->slots[i][j]->colored = copy[i][j].colored;
+        }
+
+    printf("CORNER = %d | COLOR = ", node->corner);
+    print_slot(node->color);
+    printf("\nDEBUG!! ANTES = %d | DEPOIS = %d | Saldo = %d\n\n", before, after, before-after);
+    return before - after;
+
+}
+
+// Expand the node for next search
+node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
+    
     for(int i=0; i<numColors; i++) {
         for(int j=0; j<4; j++) {
             node->children[i*4+j] = create_node(numColors);
             node->children[i*4+j]->color = i;
             node->children[i*4+j]->corner = j;
-            node->children[i*4+j]->weight = calculate_weight(node, numColors);
+            node->children[i*4+j]->weight = calculate_weight(node, numColors*4);
+            // node->children[i*4+j]->weight = calculate_weight2(board, m, n, numColors, node->children[i*4+j]);
         }
     }
 

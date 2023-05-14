@@ -21,7 +21,7 @@ typedef struct root {
 int calculate_weight(node_t *node, int numColors);
 node_t *create_node(int numColors);
 root_t* create_root(int m, int n, int numColors);
-node_t *expand_node(node_t *node, int numColors);
+node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors);
 node_t *decision(node_t *node, int numColors);
 void printChildren(node_t *node);
 void destroy_root(root_t *root, int numColors);

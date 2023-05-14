@@ -5,6 +5,50 @@
 #include "sma.h"
 
 
+// Esta parte está errada. A verifucação não funciona quando a pintura não é convexa
+void startColored(board_t *board, int m, int n) {
+
+    int color = board->slots[0][0]->color;
+    for (int i=0; i<m; i++) {
+        for (int j=0; j<n; j++) {
+            if(board->slots[i][j]->color != color)
+                break;
+            else
+                board->slots[i][j]->colored = 0;
+        }
+    }
+
+    color = board->slots[m-1][0]->color;
+    for (int i=m-1; i>=0; i--) {
+        for (int j=0; j<n; j++) {
+            if(board->slots[i][j]->color != color)
+                break;
+            else
+                board->slots[i][j]->colored = 1;
+        }
+    }
+
+    color = board->slots[m-1][n-1]->color;
+    for (int i=m-1; i>=0; i--) {
+        for (int j=n-1; j>=0; j--) {
+            if(board->slots[i][j]->color != color)
+                break;
+            else
+                board->slots[i][j]->colored = 2;
+        }
+    }
+
+    color = board->slots[0][n-1]->color;
+    for (int i=0; i<m; i++) {
+        for (int j=n-1; j>=0; j--) {
+            if(board->slots[i][j]->color != color)
+                break;
+            else
+                board->slots[i][j]->colored = 3;
+        }
+    }
+}
+
 // ---------- CREATE FUNCTIONS ----------
 board_t* create_board(int m, int n, int numColors) {
     // aloca memória para a estrutura board
@@ -37,10 +81,7 @@ board_t* create_board(int m, int n, int numColors) {
     }
 
     // Define colored values for the corners
-    board->slots[0][0]->colored = 0;
-    board->slots[m-1][0]->colored = 1;
-    board->slots[m-1][n-1]->colored = 2;
-    board->slots[0][n-1]->colored = 3;
+    // startColored(board, m, n);
     
     return board;
 }
@@ -51,6 +92,7 @@ void flood_fill_aux(slot_t *slot, int oldColor, int color) {
     // preenche o tabuleiro com a cor color
     if (slot->color == oldColor) {
         slot->color = color;
+        slot->colored = 1;
         if (slot->left != NULL) flood_fill_aux(slot->left, oldColor, color);
         if (slot->right != NULL) flood_fill_aux(slot->right, oldColor, color);
         if (slot->up != NULL) flood_fill_aux(slot->up, oldColor, color);
@@ -96,6 +138,20 @@ void flood_fill(board_t *board, int m, int n, int color, int corner) {
 
 }
 
+// ---------- HEURISTIC FUNCTIONS ----------
+int countNonColored(board_t *board, int m, int n) {
+
+    int count = 0;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if(board->slots[i][j]->colored == -1)
+                count++;
+        }
+    }
+
+    return count;
+
+}
 
 // ---------- PRINTING FUNCTIONS ----------
 void print_slot(int color) {
@@ -125,8 +181,8 @@ void print_slot(int color) {
 
 void print_board(board_t *board, int m, int n) {
 
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++)
+    for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) 
             print_slot(board->slots[i][j]->color);
         printf("\n");
     }

@@ -8,7 +8,7 @@
 int main() {
 
     // Creates important structures and variables
-    int m, n, color, numColors, numMoves = 0;
+    int m, n, color, numColors, numMoves, numNonColored = 0;
     scanf("%d %d %d", &m, &n, &numColors);
     printf("%d %d %d\n", m, n, numColors);
     board_t *board = create_board(m, n, numColors);
@@ -26,7 +26,7 @@ int main() {
         printf("\n\n");
         print_board(board, m, n);
         // scanf("%d", &color);
-        expand_node(node, numColors);
+        expand_node(board, node, m, n, numColors);
         // printChildren(node);
         node = decision(node, numColors);
         // color = calculate_weight(node, numColors);
@@ -34,7 +34,9 @@ int main() {
         numMoves++;
         //color = HEURISTICA
         flood_fill(board, m, n, node->color, node->corner);
-        printf("ESCOLHA = Cor: %d | Canto: %d | Peso: %d\n", node->color, node->corner, node->weight);
+        numNonColored = countNonColored(board, m, n);
+        print_slot(node->color);
+        printf("ESCOLHA = Cor: %d | Canto: %d | Peso: %d | Restante = %d\n", node->color, node->corner, node->weight, numNonColored);
     }
     print_board(board, m, n);
     printf("Parabéns, você completou o tabuleiro! Número de passos: %d\n", numMoves);
