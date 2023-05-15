@@ -21,6 +21,7 @@ typedef struct board {
 } board_t;
 
 board_t* create_board(int m, int n, int numColors);
+void startColored(board_t *board, int m, int n);
 void print_board(board_t *board, int m, int n);
 void print_slot(int color);
 void destroy_board(board_t *board, int m, int n);

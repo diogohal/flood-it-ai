@@ -18,9 +18,6 @@ node_t *create_node(int numColors) {
     new_node->children = malloc(sizeof(node_t*)*4*numColors);
     for(int i=0; i<numColors*4; i++)
         new_node->children[i] = NULL;
-    
-    if(new_node->children == NULL)
-        printf("É NULL!!!!\n");
 
     return new_node;
 
@@ -61,6 +58,10 @@ int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node)
     int before = countNonColored(board, m, n);
     flood_fill(board, m, n, node->color, node->corner);
     int after = countNonColored(board, m, n);
+    // printf("CORNER = %d | COLOR = ", node->corner);
+    // print_slot(node->color);
+    // printf("\n");
+    // print_board(board, m , n);
 
     for(int i=0; i<m; i++)
         for(int j=0; j<n; j++) {
@@ -68,9 +69,7 @@ int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node)
             board->slots[i][j]->colored = copy[i][j].colored;
         }
 
-    printf("CORNER = %d | COLOR = ", node->corner);
-    print_slot(node->color);
-    printf("\nDEBUG!! ANTES = %d | DEPOIS = %d | Saldo = %d\n\n", before, after, before-after);
+    // printf("\nDEBUG!! ANTES = %d | DEPOIS = %d | Saldo = %d\n", before, after, before-after);
     return before - after;
 
 }
@@ -83,10 +82,12 @@ node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
             node->children[i*4+j] = create_node(numColors);
             node->children[i*4+j]->color = i;
             node->children[i*4+j]->corner = j;
-            node->children[i*4+j]->weight = calculate_weight(node, numColors*4);
-            // node->children[i*4+j]->weight = calculate_weight2(board, m, n, numColors, node->children[i*4+j]);
+            // node->children[i*4+j]->weight = calculate_weight(node, numColors*4);
+            node->children[i*4+j]->weight = calculate_weight2(board, m, n, numColors, node->children[i*4+j]);
         }
     }
+
+    // printf("MELHOR ESCOLHA = cannto = %d | cor = %d\n", node->corner, node->color);
 
     return node;
 

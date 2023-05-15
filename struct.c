@@ -8,45 +8,24 @@
 // Esta parte está errada. A verifucação não funciona quando a pintura não é convexa
 void startColored(board_t *board, int m, int n) {
 
-    int color = board->slots[0][0]->color;
-    for (int i=0; i<m; i++) {
-        for (int j=0; j<n; j++) {
-            if(board->slots[i][j]->color != color)
-                break;
-            else
-                board->slots[i][j]->colored = 0;
-        }
-    }
+    int oldColor, color = 0;
 
-    color = board->slots[m-1][0]->color;
-    for (int i=m-1; i>=0; i--) {
-        for (int j=0; j<n; j++) {
-            if(board->slots[i][j]->color != color)
-                break;
-            else
-                board->slots[i][j]->colored = 1;
-        }
-    }
+    oldColor = board->slots[0][0]->color;
+    color = oldColor;
+    flood_fill_aux_start(board->slots[0][0], oldColor, color);
 
-    color = board->slots[m-1][n-1]->color;
-    for (int i=m-1; i>=0; i--) {
-        for (int j=n-1; j>=0; j--) {
-            if(board->slots[i][j]->color != color)
-                break;
-            else
-                board->slots[i][j]->colored = 2;
-        }
-    }
+    oldColor = board->slots[m-1][0]->color;
+    color = oldColor;
+    flood_fill_aux_start(board->slots[m-1][0], oldColor, color);
 
-    color = board->slots[0][n-1]->color;
-    for (int i=0; i<m; i++) {
-        for (int j=n-1; j>=0; j--) {
-            if(board->slots[i][j]->color != color)
-                break;
-            else
-                board->slots[i][j]->colored = 3;
-        }
-    }
+    oldColor = board->slots[m-1][n-1]->color;
+    color = oldColor;
+    flood_fill_aux_start(board->slots[m-1][n-1], oldColor, color);
+
+    oldColor = board->slots[0][n-1]->color;
+    color = oldColor;
+    flood_fill_aux_start(board->slots[0][n-1], oldColor, color);
+
 }
 
 // ---------- CREATE FUNCTIONS ----------
@@ -80,14 +59,24 @@ board_t* create_board(int m, int n, int numColors) {
         }
     }
 
-    // Define colored values for the corners
-    // startColored(board, m, n);
+    startColored(board, m, n);
     
     return board;
 }
 
 
 // ---------- COLORING FUNCTIONS ----------
+void flood_fill_aux_start(slot_t *slot, int oldColor, int color) {
+    // preenche o tabuleiro com a cor color
+    if (slot->color == oldColor) {
+        slot->colored = 1;
+        if (slot->left != NULL && slot->left->colored == -1) flood_fill_aux_start(slot->left, oldColor, color);
+        if (slot->right != NULL && slot->right->colored == -1) flood_fill_aux_start(slot->right, oldColor, color);
+        if (slot->up != NULL && slot->up->colored == -1) flood_fill_aux_start(slot->up, oldColor, color);
+        if (slot->down != NULL && slot->down->colored == -1) flood_fill_aux_start(slot->down, oldColor, color);
+    }
+}
+
 void flood_fill_aux(slot_t *slot, int oldColor, int color) {
     // preenche o tabuleiro com a cor color
     if (slot->color == oldColor) {
@@ -135,6 +124,12 @@ void flood_fill(board_t *board, int m, int n, int color, int corner) {
     oldColor = board->slots[x][y]->color;
     if (color == oldColor) return;
     flood_fill_aux(board->slots[x][y], oldColor, color);
+    
+    for(int i=0; i<m; i++) 
+        for(int j=0; j<n; j++)
+            board->slots[i][j]->colored = -1;
+
+    startColored(board, m, n);
 
 }
 
@@ -183,6 +178,7 @@ void print_board(board_t *board, int m, int n) {
 
     for (int j = 0; j < n; j++) {
         for (int i = 0; i < m; i++) 
+            // printf("%d", board->slots[i][j]->colored);
             print_slot(board->slots[i][j]->color);
         printf("\n");
     }
