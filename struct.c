@@ -148,6 +148,35 @@ int countNonColored(board_t *board, int m, int n) {
 
 }
 
+int verifyNeighboor(slot_t *slot) {
+
+    int response = 0;
+
+    if((slot->down && slot->down->colored == 1) ||
+    (slot->left && slot->left->colored == 1) ||
+    (slot->right && slot->right->colored == 1) ||
+    (slot->up && slot->up->colored == 1))
+        response = 1;
+    
+    return response;
+
+}
+
+// Count unacess areas
+int countBiggerArea(board_t *board, int m, int n) {
+
+    int count = 0;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if(board->slots[i][j]->colored == -1 && !verifyNeighboor(board->slots[i][j]))
+                count++;
+        }
+    }
+
+    return count;
+
+}
+
 // ---------- PRINTING FUNCTIONS ----------
 void print_slot(int color) {
     

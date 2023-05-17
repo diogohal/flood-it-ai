@@ -27,6 +27,7 @@ void print_slot(int color);
 void destroy_board(board_t *board, int m, int n);
 void flood_fill(board_t *board, int m, int n, int color, int corner);
 int countNonColored(board_t *board, int m, int n);
+int countBiggerArea(board_t *board, int m, int n);
 int is_board_colored(board_t *board, int m, int n);
 
 #endif

@@ -19,7 +19,10 @@ int main() {
     root_t *root = create_root(m, n, numColors);
     node_t *node = root->init;
     srand(time(NULL));
+    clock_t start, end;
+    start = clock();
 
+    numMoves = 0;
     while (!is_board_colored(board, m, n)) {
         // imprime as opções de cores coloridas   
         // printf("Escolha uma cor:\n");
@@ -27,23 +30,27 @@ int main() {
         //     print_slot(i);
         //     printf(" %d ", i); 
         // }
-        // printf("\n\n");
-        // print_board(board, m, n);
+        printf("\n\n");
+        print_board(board, m, n);
         // scanf("%d", &color);
         expand_node(board, node, m, n, numColors);
         // printChildren(node);
         node = decision(node, numColors);
-        // color = calculate_weight(node, numColors);
-        // sleep(1);
         numMoves++;
+        printf("%d\n", numMoves);     
+        // color = calculate_weight(node, numColors);
+        sleep(1);
         //color = HEURISTICA
         flood_fill(board, m, n, node->color, node->corner);
         numNonColored = countNonColored(board, m, n);
         // print_slot(node->color);
-        // printf("ESCOLHA = Cor: %d | Canto: %d | Peso: %d | Restante = %d\n", node->color, node->corner, node->weight, numNonColored);
+        printf("ESCOLHA = Cor: ");
+        print_slot(node->color);
+        printf(" | Canto: %d | Peso: %d | Restante = %d\n", node->corner, node->weight, numNonColored);
     }
     // print_board(board, m, n);
-    printf("Parabéns, você completou o tabuleiro! Número de passos: %d\n", numMoves);
+    end = clock();
+    printf("Parabéns, você completou o tabuleiro! Número de passos: %d | %f segundos\n", numMoves, ((double)(end-start))/CLOCKS_PER_SEC);
 
     destroy_root(root, numColors);
     destroy_board(board, m, n);

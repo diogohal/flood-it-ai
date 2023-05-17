@@ -74,6 +74,37 @@ int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node)
 
 }
 
+// Search for the node with the bigger area
+int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
+
+    // Board backup
+    slot_t copy[m][n];
+    for(int i=0; i<m; i++)
+        for(int j=0; j<n; j++) {
+            copy[i][j].color = board->slots[i][j]->color;
+            copy[i][j].colored = board->slots[i][j]->colored;
+        }
+    
+    // Weight calculation
+    int before = countBiggerArea(board, m, n);
+    flood_fill(board, m, n, node->color, node->corner);
+    int after = countBiggerArea(board, m, n);
+
+    printf("Cor: ");
+    print_slot(node->color);
+    printf("| Canto: %d | Peso: %d\n", node->corner, before-after);
+
+    // Reset board
+    for(int i=0; i<m; i++)
+        for(int j=0; j<n; j++) {
+            board->slots[i][j]->color = copy[i][j].color;
+            board->slots[i][j]->colored = copy[i][j].colored;
+        }
+
+    return before - after;
+
+}
+
 // Expand the node for next search
 node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
     
@@ -83,7 +114,8 @@ node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
             node->children[i*4+j]->color = i;
             node->children[i*4+j]->corner = j;
             // node->children[i*4+j]->weight = calculate_weight(node, numColors*4);
-            node->children[i*4+j]->weight = calculate_weight2(board, m, n, numColors, node->children[i*4+j]);
+            // node->children[i*4+j]->weight = calculate_weight2(board, m, n, numColors, node->children[i*4+j]);
+            node->children[i*4+j]->weight = area_heuristic(board, m, n, numColors, node->children[i*4+j]);
         }
     }
 
