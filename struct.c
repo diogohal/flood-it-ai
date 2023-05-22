@@ -161,6 +161,20 @@ int countBiggerArea(board_t *board, int m, int n) {
 
 }
 
+int remainingColor(board_t *board, int m, int n) {
+
+    int color = board->slots[0][0]->color;
+    for(int i=1; i<m; i++){
+        for(int j=0; j<n; j++) {
+            if(board->slots[i][j]->color != color)
+                return board->slots[i][j]->color;
+        }
+    }
+
+    return 0;
+
+}
+
 // ---------- PRINTING FUNCTIONS ----------
 void print_slot(int color) {
     

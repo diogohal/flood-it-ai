@@ -79,6 +79,8 @@ int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node)
 // Search for the node with the bigger area
 int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
 
+    int before, after = 0;
+
     // Board backup
     slot_t copy[m][n];
     for(int i=0; i<m; i++)
@@ -88,13 +90,16 @@ int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
         }
     
     // Weight calculation
-    int before = countBiggerArea(board, m, n);
+    // PRECISA SETAR -1 PARA OS SLOTS DESSE CANTO PARA A CONTAGEM SER VÁLIDA
+    before = countBiggerArea(board, m, n);
     flood_fill(board, m, n, node->color, node->corner);
-    int after = countBiggerArea(board, m, n);
+    after = countBiggerArea(board, m, n);
 
-    // printf("Cor: ");
-    // print_slot(node->color);
-    // printf("| Canto: %d | Peso: %d\n", node->corner, before-after);
+    // printf("BEFORE = %d | AFTER = %d\n", before, after);
+
+    printf("Cor: ");
+    print_slot(node->color);
+    printf("| Canto: %d | Peso: %d\n", node->corner, before-after);
 
     // Reset board
     for(int i=0; i<m; i++)
@@ -142,7 +147,7 @@ node_t *decision(node_t *node, int numColors) {
             free(node->children[i]->children);
             free(node->children[i]);
         }
-
+    
     return decision;
 
 }
