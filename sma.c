@@ -58,8 +58,10 @@ int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node)
     int before = countNonColored(board, m, n);
     flood_fill(board, m, n, node->color, node->corner);
     int after = countNonColored(board, m, n);
-    // printf("CORNER = %d | COLOR = ", node->corner);
+    // printf("PESO = %d | CORNER = %d | COLOR = ", before - after, node->corner);
     // print_slot(node->color);
+    // printf("\n");
+    // print_board(board, m, n);
     // printf("\n");
     // print_board(board, m , n);
 
@@ -108,6 +110,7 @@ int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
 // Expand the node for next search
 node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
     
+    // printf("NÃO COLORIDOS = %d\n", countNonColored(board, m, n));
     for(int i=0; i<numColors; i++) {
         for(int j=0; j<4; j++) {
             node->children[i*4+j] = create_node(numColors);
@@ -130,13 +133,16 @@ node_t *decision(node_t *node, int numColors) {
 
     node_t *decision = node->children[0];
     for(int i=1; i<numColors*4; i++)
-        if(node->children[i]->weight > decision->weight)
+        if(node->children[i]->weight > decision->weight) {
+            free(decision->children);
+            free(decision);
             decision = node->children[i];
+        }
         else {
             free(node->children[i]->children);
             free(node->children[i]);
         }
-        
+
     return decision;
 
 }
@@ -145,17 +151,18 @@ node_t *decision(node_t *node, int numColors) {
 // ---------- DESTROY FUNCTIONS ----------
 void destroy_node(node_t *node, int numColors) {
 
-    if(node == NULL)
+    if(!node)
         return;
     
-    if(node->children[0] != NULL) {
-        for(int i=0; i<numColors*4; i++)
+    for(int i=0; i<4*numColors; i++) {
+        if(node->children[i]) {
             destroy_node(node->children[i], numColors);
+            printf("oii\n");
+        }
     }
-    
+
     free(node->children);
     free(node);
-
 
 }
 
@@ -180,6 +187,24 @@ void printChildren(node_t *node) {
         printf("Canto = %d | Peso = %d | Cor = %d\n", child->corner, child->weight, child->color);
         i++;
         child = node->children[i];
+    }
+
+}
+
+void printNodes(root_t *root, int numColors) {
+
+    node_t *node = root->init;
+
+    while(node) {
+        for(int i=0; i<numColors*4; i++) {
+            if(node->children[i]) {
+                print_slot(node->children[i]->color);
+                node = node->children[i];
+                break;
+            }
+            
+        }
+        printf("\n");
     }
 
 }

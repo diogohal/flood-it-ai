@@ -16,6 +16,7 @@ typedef struct slot {
 typedef struct board {
 
     int numColors;
+    
     slot_t ***slots;
 
 } board_t;
