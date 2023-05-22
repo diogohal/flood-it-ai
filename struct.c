@@ -64,6 +64,17 @@ board_t* create_board(int m, int n, int numColors) {
     return board;
 }
 
+void readBoard(board_t *board, FILE *file, int m, int n) {
+
+    for (int j = 0; j < m; j++)
+        for (int i = 0; i < n; i++) {
+            fscanf(file, "%d", &board->slots[i][j]->color);
+            board->slots[i][j]->color--;
+        }
+
+
+}
+
 
 // ---------- COLORING FUNCTIONS ----------
 void flood_fill_aux_start(slot_t *slot, int oldColor, int color) {
@@ -209,6 +220,17 @@ void print_board(board_t *board, int m, int n) {
         for (int i = 0; i < m; i++) 
             // printf("%d", board->slots[i][j]->colored);
             print_slot(board->slots[i][j]->color);
+        printf("\n");
+    }
+
+}
+
+
+void print_board_num(board_t *board, int m, int n) {
+
+    for (int j = 0; j < n; j++) {
+        for (int i = 0; i < m; i++) 
+            printf("%2d ", board->slots[i][j]->color);
         printf("\n");
     }
 

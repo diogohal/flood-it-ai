@@ -7,12 +7,15 @@
 
 int main() {
 
+    FILE *file = fopen("30x30_example.txt", "r");
+
     // Creates important structures and variables
     int m, n, color, numColors, numMoves, numNonColored = 0;
     scanf("%d %d %d", &m, &n, &numColors);
-    // printf("%d %d %d\n", m, n, numColors);
+    // fscanf(file, "%d %d %d", &m, &n, &numColors);
+    printf("%d %d %d\n", m, n, numColors);
     board_t *board = create_board(m, n, numColors);
-    int teste = countNonColored(board, m, n);
+    // readBoard(board, file, m, n);
     // printf("%d\n\n", teste);
     // printf("%d\n", board->slots[m-2][0]->colored);
     // print_board(board, m, n);
@@ -24,29 +27,29 @@ int main() {
 
     numMoves = 0;
     while (!is_board_colored(board, m, n)) {
+        expand_node(board, node, m, n, numColors);
+        node = decision(node, numColors);
+        numMoves++;
+        flood_fill(board, m, n, node->color, node->corner);
+        numNonColored = countNonColored(board, m, n);
         // imprime as opções de cores coloridas   
         // printf("Escolha uma cor:\n");
         // for (int i = 0; i < numColors; i++) {
         //     print_slot(i);
         //     printf(" %d ", i); 
         // }
-        printf("\n\n");
-        print_board(board, m, n);
+        // printf("\n\n");
+        // print_board_num(board, m, n);
         // scanf("%d", &color);
-        expand_node(board, node, m, n, numColors);
         // printChildren(node);
-        node = decision(node, numColors);
-        numMoves++;
-        printf("%d\n", numMoves);     
+        // printf("%d\n", numMoves);     
         // color = calculate_weight(node, numColors);
-        sleep(1);
+        // sleep(1);
         //color = HEURISTICA
-        flood_fill(board, m, n, node->color, node->corner);
-        numNonColored = countNonColored(board, m, n);
         // print_slot(node->color);
-        printf("ESCOLHA = Cor: ");
-        print_slot(node->color);
-        printf(" | Canto: %d | Peso: %d | Restante = %d\n", node->corner, node->weight, numNonColored);
+        // printf("ESCOLHA = Cor: ");
+        // print_slot(node->color);
+        // printf(" | Canto: %d | Peso: %d | Restante = %d\n", node->corner, node->weight, numNonColored);
     }
     // print_board(board, m, n);
     end = clock();
