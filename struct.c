@@ -49,12 +49,12 @@ void readBoard(board_t *board, FILE *file, int m, int n) {
 
 }
 
+// ---------- AUX FUNCTIONS ----------
 void setToNonColored(board_t *board, int m, int n) {
     for(int i=0; i<m; i++) 
         for(int j=0; j<n; j++)
             board->slots[i][j]->colored = -1;    
 }
-
 
 // ---------- COLORING FUNCTIONS ----------
 void flood_fill_aux_start(slot_t *slot, int oldColor, int color) {
@@ -162,20 +162,6 @@ int countBiggerArea(board_t *board, int m, int n) {
     }
 
     return count;
-
-}
-
-int remainingColor(board_t *board, int m, int n) {
-
-    int color = board->slots[0][0]->color;
-    for(int i=1; i<m; i++){
-        for(int j=0; j<n; j++) {
-            if(board->slots[i][j]->color != color)
-                return board->slots[i][j]->color;
-        }
-    }
-
-    return 0;
 
 }
 

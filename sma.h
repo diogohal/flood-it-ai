@@ -8,6 +8,7 @@ typedef struct node {
     int color;
     int corner;
     struct node **children;
+    struct node *next;
 
 } node_t;
 
@@ -18,7 +19,6 @@ typedef struct root {
 
 } root_t;
 
-int calculate_weight(node_t *node, int numColors);
 node_t *create_node(int numColors);
 root_t* create_root(int m, int n, int numColors);
 node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors);
