@@ -33,5 +33,6 @@ int is_board_colored(board_t *board, int m, int n);
 void readBoard(board_t *board, FILE *file, int m, int n);
 void print_board_num(board_t *board, int m, int n);
 int remainingColor(board_t *board, int m, int n);
+void setToNonColored(board_t *board, int m, int n);
 
 #endif

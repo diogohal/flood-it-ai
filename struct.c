@@ -49,6 +49,12 @@ void readBoard(board_t *board, FILE *file, int m, int n) {
 
 }
 
+void setToNonColored(board_t *board, int m, int n) {
+    for(int i=0; i<m; i++) 
+        for(int j=0; j<n; j++)
+            board->slots[i][j]->colored = -1;    
+}
+
 
 // ---------- COLORING FUNCTIONS ----------
 void flood_fill_aux_start(slot_t *slot, int oldColor, int color) {
@@ -109,9 +115,7 @@ void flood_fill(board_t *board, int m, int n, int color, int corner) {
     if (color == oldColor) return;
     flood_fill_aux(board->slots[x][y], oldColor, color);
     
-    for(int i=0; i<m; i++) 
-        for(int j=0; j<n; j++)
-            board->slots[i][j]->colored = -1;
+    setToNonColored(board, m, n);
 
     flood_fill_aux_start(board->slots[x][y], board->slots[x][y]->color, oldColor);
 

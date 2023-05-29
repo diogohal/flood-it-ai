@@ -26,5 +26,6 @@ node_t *decision(node_t *node, int numColors);
 void printChildren(node_t *node);
 void destroy_root(root_t *root, int numColors);
 void printNodes(root_t *root, int numColors);
+char printCorner(int corner);
 
 #endif
