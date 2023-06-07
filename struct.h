@@ -21,18 +21,26 @@ typedef struct board {
 
 } board_t;
 
+// Create functions
 board_t* create_board(int m, int n, int numColors);
-void print_board(board_t *board, int m, int n);
-void print_slot(int color);
-void destroy_board(board_t *board, int m, int n);
+void readBoard(board_t *board, FILE *file, int m, int n);
+
+// Control functions
 void flood_fill(board_t *board, int m, int n, int color, int corner);
 void flood_fill_aux_start(slot_t *slot, int oldColor, int color);
-int countNonColored(board_t *board, int m, int n);
-int countBiggerArea(board_t *board, int m, int n);
 int is_board_colored(board_t *board, int m, int n);
-void readBoard(board_t *board, FILE *file, int m, int n);
-void print_board_num(board_t *board, int m, int n);
-int remainingColor(board_t *board, int m, int n);
 void setToNonColored(board_t *board, int m, int n);
+
+// Heuristic Aux Functions
+int countNonColored(board_t *board, int m, int n);
+int countUnaccessedAreas(board_t *board, int m, int n);
+
+// Printing functions
+void print_slot(int color);
+void print_board(board_t *board, int m, int n);
+void print_board_num(board_t *board, int m, int n);
+
+// Destroy functinos
+void destroy_board(board_t *board, int m, int n);
 
 #endif

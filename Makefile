@@ -15,7 +15,7 @@ clean:
 	rm *.o *.temp
 
 purge: clean
-	rm floodit
+	rm -f floodit
 
 run: all
 	./floodit

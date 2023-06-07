@@ -6,6 +6,7 @@
 
 
 // ---------- CREATE FUNCTIONS ----------
+// Create a node of the search tree
 node_t *create_node(int numColors) {
 
     node_t *new_node = malloc(sizeof(node_t));
@@ -24,6 +25,7 @@ node_t *create_node(int numColors) {
 
 }
 
+// Create the root of the search tree
 root_t* create_root(int m, int n, int numColors) {
 
     root_t *new_root = malloc(sizeof(root_t));
@@ -40,7 +42,7 @@ root_t* create_root(int m, int n, int numColors) {
 
 // ---------- SEARCH FUNCTIONS ----------
 // Calculates the weight based in how much new slots will be colored
-int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node) {
+int colored_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
 
     // Board backup 
     slot_t copy[m][n];
@@ -50,7 +52,7 @@ int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node)
             copy[i][j].colored = board->slots[i][j]->colored;
         }
     
-    // Count non colored slots
+    // Count non colored slots before and after the node move
     int before = countNonColored(board, m, n);
     flood_fill(board, m, n, node->color, node->corner);
     int after = countNonColored(board, m, n);
@@ -66,7 +68,7 @@ int calculate_weight2(board_t *board, int m, int n, int numColors, node_t *node)
 
 }
 
-// Search for the node with the bigger area
+// Calculate the weight based in how much new slots will be accessible (colored regions with it's border)
 int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
 
     int before, after, x, y = 0;
@@ -79,6 +81,7 @@ int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
             copy[i][j].colored = board->slots[i][j]->colored;
         }
 
+    // Set the coordinates of the corner
     if(node->corner == 0) {
         x = 0;
         y = 0;
@@ -96,20 +99,13 @@ int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
         y = n-1;
     }        
 
-    // Count non access areas
+    // Count non access areas before and after the node move
     setToNonColored(board, m, n);
     flood_fill_aux_start(board->slots[x][y], board->slots[x][y]->color, board->slots[x][y]->color);
-    before = countBiggerArea(board, m, n);
+    before = countUnaccessedAreas(board, m, n);
     flood_fill(board, m, n, node->color, node->corner);
-    after = countBiggerArea(board, m, n);
+    after = countUnaccessedAreas(board, m, n);
     
-
-    // printf("BEFORE = %d | AFTER = %d\n", before, after);
-
-    // printf("Cor: ");
-    // print_slot(node->color);
-    // printf("| Canto: %d | Peso: %d\n", node->corner, before-after);
-
     // Reset board
     for(int i=0; i<m; i++)
         for(int j=0; j<n; j++) {
@@ -121,17 +117,44 @@ int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
 
 }
 
-// Expand the node for next search
+// Expand the search tree from a node with a specified corner
+node_t *expand_node_corner(board_t *board, node_t *node, int m, int n, int numColors, int corner) {
+
+    int max = 0;
+    for(int i=0; i<numColors; i++) {
+        node->children[i] = create_node(numColors);
+        node->children[i]->color = i;
+        node->children[i]->corner = corner;
+        // Use area heuristic (main) if there are a lot of unaccessed
+        if(countUnaccessedAreas(board, m, n) > 10)
+            node->children[i]->weight = area_heuristic(board, m, n, numColors, node->children[i]);
+        // Use colored heuristic (main) if there are a lot of unaccessed
+        else
+            node->children[i]->weight = colored_heuristic(board, m, n, numColors, node->children[i]);
+
+        if(node->children[i]->weight > max)
+            max = node->children[i]->weight;
+    }
+
+    // if(max == 0) {
+    //     for(int i=0; i<numColors; i++) {
+    //         node->children[i]->weight = colored_heuristic(board, m, n, numColors, node->children[i]);        }
+    // }
+
+    return node;
+
+}
+
+// Expand the search tree from a node with not specified corner
 node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
     
     int max = 0;
-    // Main heuristic
+    // Area heuristic (main)
     for(int i=0; i<numColors; i++) {
         for(int j=0; j<4; j++) {
             node->children[i*4+j] = create_node(numColors);
             node->children[i*4+j]->color = i;
             node->children[i*4+j]->corner = j;
-            // node->children[i*4+j]->weight = calculate_weight2(board, m, n, numColors, node->children[i*4+j]);
             node->children[i*4+j]->weight = area_heuristic(board, m, n, numColors, node->children[i*4+j]);
             if(node->children[i*4+j]->weight > max)
                 max = node->children[i*4+j]->weight;
@@ -142,7 +165,7 @@ node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
     if(max == 0) {
         for(int i=0; i<numColors; i++) {
             for(int j=0; j<4; j++)
-                node->children[i*4+j]->weight = calculate_weight2(board, m, n, numColors, node->children[i*4+j]);
+                node->children[i*4+j]->weight = colored_heuristic(board, m, n, numColors, node->children[i*4+j]);
         }
     }
 
@@ -150,12 +173,12 @@ node_t *expand_node(board_t *board, node_t *node, int m, int n, int numColors) {
 
 }
 
-// Makes the decision of the tree path
-node_t *decision(node_t *node, int numColors) {
+// Choose the node with greater weight. Free the other nodes. 
+node_t *decision(node_t *node, int numColors, int numCorners) {
 
     node_t *decision = node->children[0];
     node->next = decision;
-    for(int i=1; i<numColors*4; i++)
+    for(int i=1; i<numColors*numCorners; i++)
         if(node->children[i]->weight > decision->weight) {
             free(decision->children);
             free(decision);
@@ -173,6 +196,7 @@ node_t *decision(node_t *node, int numColors) {
 
 
 // ---------- DESTROY FUNCTIONS ----------
+// Destroy all remaining nodes
 void destroy_node(node_t *node, int numColors) {
 
     if(!node)
@@ -184,6 +208,7 @@ void destroy_node(node_t *node, int numColors) {
 
 }
 
+// Destroy the root and all the remaining nodes
 void destroy_root(root_t *root, int numColors) {
 
     if (root == NULL)
@@ -195,38 +220,8 @@ void destroy_root(root_t *root, int numColors) {
 }
 
 
-// ---------- OTHERS FUNCTIONS ----------
-// Print the corner, weight and color of each child of a node
-void printChildren(node_t *node) {
-
-    int i = 0;
-    node_t *child = node->children[i];
-    while(child) {
-        printf("Canto = %d | Peso = %d | Cor = %d\n", child->corner, child->weight, child->color);
-        i++;
-        child = node->children[i];
-    }
-
-}
-
-void printNodes(root_t *root, int numColors) {
-
-    node_t *node = root->init;
-
-    while(node) {
-        for(int i=0; i<numColors*4; i++) {
-            if(node->children[i]) {
-                print_slot(node->children[i]->color);
-                node = node->children[i];
-                break;
-            }
-            
-        }
-        printf("\n");
-    }
-
-}
-
+// ---------- PRINTING FUNCTIONS ----------
+// Print the letter of a giving number corner
 char printCorner(int corner) {
 
     if(corner == 0)

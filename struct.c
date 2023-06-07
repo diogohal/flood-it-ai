@@ -5,12 +5,12 @@
 #include "sma.h"
 
 // ---------- CREATE FUNCTIONS ----------
+// Create a board structure
 board_t* create_board(int m, int n, int numColors) {
-    // aloca memória para a estrutura board
     board_t *board = (board_t*) malloc(sizeof(board_t));
     board->numColors = numColors;
 
-    // aloca memória para a matriz de slots
+    // Allocate memory for the slots matrix
     board->slots = (slot_t***) malloc(m * sizeof(slot_t**));
     for (int i = 0; i < m; i++) {
         board->slots[i] = (slot_t**) malloc(n * sizeof(slot_t*));
@@ -38,6 +38,7 @@ board_t* create_board(int m, int n, int numColors) {
     return board;
 }
 
+// Read an existing board
 void readBoard(board_t *board, FILE *file, int m, int n) {
 
     for (int j = 0; j < n; j++)
@@ -49,16 +50,17 @@ void readBoard(board_t *board, FILE *file, int m, int n) {
 
 }
 
-// ---------- AUX FUNCTIONS ----------
+
+// ---------- CONTROL FUNCTIONS ----------
+// Set every slot to non colored
 void setToNonColored(board_t *board, int m, int n) {
     for(int i=0; i<m; i++) 
         for(int j=0; j<n; j++)
             board->slots[i][j]->colored = -1;    
 }
 
-// ---------- COLORING FUNCTIONS ----------
+// Set all paiting area from a corner to colored
 void flood_fill_aux_start(slot_t *slot, int oldColor, int color) {
-    // preenche o tabuleiro com a cor color
     if (slot->color == oldColor) {
         slot->colored = 1;
         if (slot->left != NULL && slot->left->colored == -1) flood_fill_aux_start(slot->left, oldColor, color);
@@ -68,8 +70,8 @@ void flood_fill_aux_start(slot_t *slot, int oldColor, int color) {
     }
 }
 
+// Set all paiting area from a corner to the new color
 void flood_fill_aux(slot_t *slot, int oldColor, int color) {
-    // preenche o tabuleiro com a cor color
     if (slot->color == oldColor) {
         slot->color = color;
         if (slot->left != NULL) flood_fill_aux(slot->left, oldColor, color);
@@ -79,14 +81,16 @@ void flood_fill_aux(slot_t *slot, int oldColor, int color) {
     }
 }
 
+// Verify if the game is complete
 int is_board_colored(board_t *board, int m, int n) {
-    // verifica se o tabuleiro está colorido
+
     int color = board->slots[0][0]->color;
     for (int i = 0; i < m; i++) 
         for (int j = 0; j < n; j++)
             if (board->slots[i][j]->color != color)
                 return 0;
     return 1;
+
 }
 
 // Fill the board with the decision obtained in tree search
@@ -94,6 +98,7 @@ void flood_fill(board_t *board, int m, int n, int color, int corner) {
     
     int oldColor, x, y = 0;
 
+    // Set the start corner
     if(corner == 0) {
         x = 0;
         y = 0;
@@ -110,32 +115,22 @@ void flood_fill(board_t *board, int m, int n, int color, int corner) {
         x = 0;
         y = n-1;
     }
-
-    oldColor = board->slots[x][y]->color;
-    if (color == oldColor) return;
-    flood_fill_aux(board->slots[x][y], oldColor, color);
     
-    setToNonColored(board, m, n);
+    // If the new color is the same, doesn't change anything
+    oldColor = board->slots[x][y]->color;
+    if(color == oldColor)
+        return;
 
+    // Fill the paiting area with the new color and set the new area colored
+    flood_fill_aux(board->slots[x][y], oldColor, color);
+    setToNonColored(board, m, n);
     flood_fill_aux_start(board->slots[x][y], board->slots[x][y]->color, oldColor);
 
 }
 
-// ---------- HEURISTIC FUNCTIONS ----------
-int countNonColored(board_t *board, int m, int n) {
 
-    int count = 0;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            if(board->slots[i][j]->colored == -1)
-                count++;
-        }
-    }
-
-    return count;
-
-}
-
+// ---------- HEURISTIC AUX FUNCTIONS ----------
+// Check if there are colored slots around
 int verifyNeighboor(slot_t *slot) {
 
     int response = 0;
@@ -150,8 +145,23 @@ int verifyNeighboor(slot_t *slot) {
 
 }
 
-// Count unacess areas
-int countBiggerArea(board_t *board, int m, int n) {
+// Count non colored slots
+int countNonColored(board_t *board, int m, int n) {
+
+    int count = 0;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if(board->slots[i][j]->colored == -1)
+                count++;
+        }
+    }
+
+    return count;
+
+}
+
+// Count unaccessed slots
+int countUnaccessedAreas(board_t *board, int m, int n) {
 
     int count = 0;
     for (int i = 0; i < m; i++) {
@@ -165,32 +175,17 @@ int countBiggerArea(board_t *board, int m, int n) {
 
 }
 
+
 // ---------- PRINTING FUNCTIONS ----------
+// Print the slot with as a color
 void print_slot(int color) {
     
-    if(color == 0)
-        printf("\033[41m  \033[0m");
-    else if(color == 1)
-        printf("\033[42m  \033[0m");
-    else if(color == 2)
-        printf("\033[43m  \033[0m");
-    else if(color == 3)
-        printf("\033[44m  \033[0m");
-    else if(color == 4)
-        printf("\033[45m  \033[0m");
-    else if(color == 5)
-        printf("\033[46m  \033[0m");
-    else if(color == 6)
-        printf("\033[47m  \033[0m");
-    else if(color == 7)
-        printf("\033[101m  \033[0m");
-    else if(color == 8)
-        printf("\033[102m  \033[0m");
-    else if(color == 9)
-        printf("\033[103m  \033[0m");
+    printf("\033[48;5;%dm  \033[0m", color);
+    return;
 
 }
 
+// Print all board with slots as a color
 void print_board(board_t *board, int m, int n) {
 
     for (int j = 0; j < n; j++) {
@@ -202,7 +197,7 @@ void print_board(board_t *board, int m, int n) {
 
 }
 
-
+// Print all board with slots as a number
 void print_board_num(board_t *board, int m, int n) {
 
     for (int j = 0; j < n; j++) {
@@ -215,6 +210,7 @@ void print_board_num(board_t *board, int m, int n) {
 
 
 // ---------- DESTROY FUNCTIONS ----------
+// Destroy the board and it's slots
 void destroy_board(board_t *board, int m, int n) {
 
     for (int i = 0; i < m; i++) {
@@ -227,4 +223,3 @@ void destroy_board(board_t *board, int m, int n) {
     free(board);
 
 }
-
