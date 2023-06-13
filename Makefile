@@ -12,7 +12,7 @@ sma.o: sma.c struct.c
 	gcc $(CFLAGS) -c sma.c
 
 clean:
-	rm *.o *.temp
+	rm -f *.o *.temp
 
 purge: clean
 	rm -f floodit

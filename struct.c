@@ -39,11 +39,11 @@ board_t* create_board(int m, int n, int numColors) {
 }
 
 // Read an existing board
-void readBoard(board_t *board, FILE *file, int m, int n) {
+void readBoard(board_t *board, int m, int n) {
 
     for (int j = 0; j < n; j++)
         for (int i = 0; i < m; i++) {
-            fscanf(file, "%d", &board->slots[i][j]->color);
+            scanf("%d", &board->slots[i][j]->color);
             board->slots[i][j]->color--;
         }
 

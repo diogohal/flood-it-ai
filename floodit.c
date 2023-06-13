@@ -9,27 +9,15 @@ int main() {
 
     // Create important structures and variables
     srand(time(NULL));
-    FILE *file = fopen("30x30_example.txt", "r");
     FILE *out = fopen("solution.txt", "w");
     int m = 0, n = 0, numColors = 0, numMoves = 0, corner = 0;
-    
-    // Testing
-    m = rand() % 100 + 1;
-    n = rand() % 100 + 1;
-    numColors = rand() % 20 + 1;
-    
-    m = 100; n = 100; numColors = 20;
-    
-    printf("Instance: m = %d, n = %d, numColors = %d\n", m, n, numColors);
-
-
     clock_t start, end;
+    
 
     // Create board instance and search tree
-    // scanf("%d %d %d", &m, &n, &numColors);
-    // fscanf(file, "%d %d %d", &m, &n, &numColors);
+    scanf("%d %d %d", &n, &m, &numColors);
     board_t *board = create_board(m, n, numColors);
-    // readBoard(board, file, m, n);
+    readBoard(board, m, n);
     root_t *root = create_root(m, n, numColors);
     node_t *node = root->init;
     fprintf (out, "         \n");
@@ -45,6 +33,7 @@ int main() {
     numMoves++;
     fprintf(out, "%c ", printCorner(node->corner));
     fprintf(out, "%d ", node->color+1);
+
     // The next executions has the corner fixed
     while (!is_board_colored(board, m, n)) {
         expand_node_corner(board, node, m, n, numColors, corner);
@@ -53,9 +42,6 @@ int main() {
         numMoves++;
         fprintf(out, "%c ", printCorner(node->corner));
         fprintf(out, "%d ", node->color+1);
-        // sleep(1);
-        // printf("\n\n");
-        // print_board(board, m, n);
     }
     rewind(out);
     fprintf(out, "%d", numMoves);
@@ -68,7 +54,6 @@ int main() {
 
     destroy_root(root, numColors);
     destroy_board(board, m, n);
-    fclose(file);
     fclose(out);
     return 0;
 

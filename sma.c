@@ -120,7 +120,6 @@ int area_heuristic(board_t *board, int m, int n, int numColors, node_t *node) {
 // Expand the search tree from a node with a specified corner
 node_t *expand_node_corner(board_t *board, node_t *node, int m, int n, int numColors, int corner) {
 
-    int max = 0;
     for(int i=0; i<numColors; i++) {
         node->children[i] = create_node(numColors);
         node->children[i]->color = i;
@@ -131,15 +130,7 @@ node_t *expand_node_corner(board_t *board, node_t *node, int m, int n, int numCo
         // Use colored heuristic (main) if there are a lot of unaccessed
         else
             node->children[i]->weight = colored_heuristic(board, m, n, numColors, node->children[i]);
-
-        if(node->children[i]->weight > max)
-            max = node->children[i]->weight;
     }
-
-    // if(max == 0) {
-    //     for(int i=0; i<numColors; i++) {
-    //         node->children[i]->weight = colored_heuristic(board, m, n, numColors, node->children[i]);        }
-    // }
 
     return node;
 

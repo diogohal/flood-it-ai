@@ -23,7 +23,7 @@ typedef struct board {
 
 // Create functions
 board_t* create_board(int m, int n, int numColors);
-void readBoard(board_t *board, FILE *file, int m, int n);
+void readBoard(board_t *board, int m, int n);
 
 // Control functions
 void flood_fill(board_t *board, int m, int n, int color, int corner);
